@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مكتبة برومتات الصور بالذكاء الاصطناعي</title>
+<meta name="description" content="مئات برومتات الترند لعمل الصور وتعديلها بالذكاء الاصطناعي. انسخ البرومت وجرّبه فورًا.">
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --text:#1f2430; --muted:#6b7280;
+    --primary:#1e5eff; --primary-d:#1648c9; --border:#e3e6ec;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1100px;margin:auto;padding:0 14px}
+
+  /* الهيدر */
+  header{background:#fff;border-bottom:1px solid var(--border)}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 0;flex-wrap:wrap}
+  .logo{font-size:22px;font-weight:800;color:var(--primary);cursor:pointer}
+  nav a{margin-inline-start:14px;color:var(--muted);font-size:15px;cursor:pointer}
+  nav a:hover{color:var(--primary)}
+
+  /* البانر */
+  .hero{background:linear-gradient(135deg,#1e5eff,#6a3df0);color:#fff;text-align:center;padding:38px 14px}
+  .hero h1{font-size:26px;margin-bottom:8px}
+  .hero p{opacity:.9;margin-bottom:18px}
+  .search{max-width:520px;margin:auto}
+  .search input{width:100%;padding:13px 16px;border:0;border-radius:10px;font-size:16px;font-family:inherit;outline:none}
+
+  /* التصنيفات */
+  .cats{display:flex;gap:8px;flex-wrap:wrap;padding:18px 0 6px}
+  .cat{padding:7px 16px;border:1px solid var(--border);background:#fff;border-radius:20px;cursor:pointer;font-size:14px;font-family:inherit}
+  .cat.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+  /* الشبكة */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;padding:14px 0 30px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+  .thumb{aspect-ratio:4/5;background:linear-gradient(135deg,#dfe7ff,#efe3ff);display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .card-body{padding:12px}
+  .card-body h3{font-size:16px;margin-bottom:6px}
+  .tag{display:inline-block;font-size:12px;background:#eef2ff;color:var(--primary);padding:2px 10px;border-radius:12px}
+  .empty{text-align:center;color:var(--muted);padding:40px 0}
+
+  /* صفحة البرومت */
+  .detail{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;margin:20px 0}
+  .back{display:inline-block;margin:16px 0 0;color:var(--primary);cursor:pointer;font-size:15px}
+  .d-wrap{display:grid;grid-template-columns:320px 1fr;gap:20px}
+  .d-img{border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#dfe7ff,#efe3ff);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;font-size:60px}
+  .d-img img{width:100%;height:100%;object-fit:cover}
+  .d-info h2{font-size:22px;margin-bottom:8px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .promptbox{background:#f8f9fb;border:1px dashed #b8c2d6;border-radius:10px;padding:14px;direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:14px;white-space:pre-wrap;word-break:break-word}
+  .note{background:#fff8e1;border:1px solid #ffe08a;border-radius:8px;padding:8px 12px;font-size:14px;margin-bottom:12px}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{padding:11px 22px;border:0;border-radius:8px;font-size:15px;cursor:pointer;font-family:inherit;font-weight:600}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-primary:hover{background:var(--primary-d)}
+  .btn-light{background:#eef2ff;color:var(--primary)}
+  h2.sec{font-size:19px;margin:22px 0 4px}
+
+  /* الصفحات الثابتة */
+  .page{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px;margin:20px 0}
+  .page h2{margin-bottom:10px}
+  .page p{margin-bottom:10px;color:#374151}
+
+  /* الفوتر */
+  footer{background:#1f2430;color:#cbd2e0;text-align:center;padding:22px 14px;margin-top:30px;font-size:14px}
+  footer a{margin:0 10px;cursor:pointer;color:#fff}
+
+  /* رسالة النسخ */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;padding:10px 22px;border-radius:24px;font-size:15px;transition:.3s;z-index:100000;opacity:0}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+  @media(max-width:700px){
+    .d-wrap{grid-template-columns:1fr}
+    .hero h1{font-size:21px}
+    .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .card-body h3{font-size:14px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== إعلان A-ADS (Sticky) ===== -->
+<!-- BEGIN AADS AD UNIT 2457738 -->
+<div style="position: absolute; z-index: 99999">
+  <input autocomplete="off" type="checkbox" id="aadsstickymuy13zg2" hidden />
+  <div style="padding-top: auto; padding-bottom: 0;">
+    <div style="width:100%;height:auto;position:fixed;text-align:center;font-size:0;top:0;left:0;right:0;margin:auto">
+      <label for="aadsstickymuy13zg2" style="top: 50%;transform: translateY(-50%);right:24px;; position: absolute;border-radius: 4px; background: rgba(248, 248, 249, 0.70); padding: 4px;z-index: 99999;cursor:pointer">
+        <svg fill="#000000" height="16px" width="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 490">
+          <polygon points="456.851,0 245,212.564 33.149,0 0.708,32.337 212.669,245.004 0.708,457.678 33.149,490 245,277.443 456.851,490 489.292,457.678 277.331,245.004 489.292,32.337 "/>
+        </svg>
+      </label>
+      <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
+        <iframe data-aa="2457738" src="//acceptable.a-ads.com/2457738/?size=Adaptive" style="border:0; padding:0; width:70%; height:auto; overflow:hidden; margin: auto"></iframe>
+        <div style="width: 70%;margin:auto;text-align: left;position: absolute;left: 0;right: 0">
+          <a style="display:inline-block;font-size: 13px;color: #263238;padding: 4px 10px;background: #F8F8F9;text-decoration: none; border-radius: 0 0 4px 4px;"
+            id="frame-link" target="_blank"
+            href="https://aads.com/campaigns/new?source_id=2457738&source_type=ad_unit&partner=2457738">
+            Advertise here
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>#aadsstickymuy13zg2:checked + div{display:none;}</style>
+<!-- END AADS AD UNIT 2457738 -->
+
+<header>
+  <div class="wrap top">
+    <div class="logo" onclick="goHome()">✨ مكتبة البرومتات</div>
+    <nav>
+      <a onclick="goHome()">الرئيسية</a>
+      <a onclick="goPage('about')">من نحن</a>
+      <a onclick="goPage('contact')">تواصل معنا</a>
+    </nav>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  <div style="margin-bottom:8px">
+    <a onclick="goPage('about')">من نحن</a>
+    <a onclick="goPage('privacy')">سياسة الخصوصية</a>
+    <a onclick="goPage('terms')">الشروط</a>
+    <a onclick="goPage('contact')">تواصل معنا</a>
+  </div>
+  <div>© <span id="yr"></span> مكتبة البرومتات — جميع الحقوق محفوظة</div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================
+   ✏️ هنا تكتب البرومتات
+   انسخ هذا الشكل لكل برومت، وافصل بين البرومتات بفاصلة.
+   - slug: رابط البرومت (إنجليزي صغير، وبدون مسافات، ولا يتكرر)
+   - title: العنوان بالعربي
+   - category: التصنيف
+   - photo: true إذا يحتاج المستخدم يرفع صورته
+   - tool: اسم الأداة (اختياري)
+   - image: رابط صورة النتيجة (اختياري). ارفعها في مجلد images
+            واكتب مثلًا "images/ghibli.webp"
+   - prompt: نص البرومت
+   ===================================================== */
+const PROMPTS = [
+  {
+    slug: "3d-figurine-desk",
+    title: "مجسم 3D لك على المكتب",
+    category: "ترند",
+    photo: true,
+    tool: "Gemini / ChatGPT",
+    image: "",
+    prompt: "Create a 1/7 scale collectible figurine of the person in this photo, standing on a round transparent base on a computer desk. Keep the face and outfit identical. Realistic PVC texture, glossy finish, soft studio lighting, a colorful toy box with artwork behind it."
+  },
+
+  /* ⬇⬇⬇ ألصق برومتاتك هنا ⬇⬇⬇ */
+
+{slug:"watercolor-anime-portrait",title:"بورتريه أنمي بألوان مائية",category:"أنمي",photo:true,prompt:"Transform this photo into a soft hand-painted anime film style portrait with watercolor backgrounds, gentle pastel colors, delicate line work, warm sunlight and drifting clouds. Keep the face recognizable."},
+  {slug:"90s-yearbook",title:"صورة كتاب سنوي من التسعينات",category:"ريترو",photo:true,prompt:"Turn this photo into a 1990s school yearbook portrait: blue laser-style backdrop, slightly faded film grain, soft flash, retro clothing and hairstyle, warm vintage colors. Keep the face identical."},
+  {slug:"cinematic-movie-poster",title:"ملصق فيلم سينمائي",category:"سينمائي",photo:true,prompt:"Make this photo into a dramatic cinematic movie poster. The person stands in the center, moody teal and orange lighting, a city skyline behind, large blank title area at the bottom, shallow depth of field, ultra detailed."},
+  {slug:"golden-hour-edit",title:"إضاءة الغروب الذهبية",category:"تعديل صور",photo:true,prompt:"Edit this photo to look like it was taken during golden hour. Add warm sunlight from the side, soft rim light on hair, gentle lens flare, richer skin tones. Do not change the face or pose."},
+  {slug:"remove-background-studio",title:"خلفية استوديو احترافية",category:"تعديل صور",photo:true,prompt:"Replace the background of this photo with a clean light-gray professional studio backdrop. Keep the person exactly the same, fix the edges around the hair, add soft even studio lighting."},
+  {slug:"clay-animation-style",title:"شخصية من الصلصال",category:"ترند",photo:true,prompt:"Turn this photo into a claymation character in the style of a handmade stop-motion film. Visible fingerprint textures, soft rounded shapes, bright colors, miniature set background, soft studio light."},
+  {slug:"pixar-style-3d",title:"شخصية كرتون 3D",category:"ترند",photo:true,prompt:"Convert this photo into a cute 3D animated movie character with big expressive eyes, smooth skin, soft cinematic lighting and a colorful blurred background. Keep hairstyle and outfit similar."},
+  {slug:"pencil-sketch",title:"رسم بقلم الرصاص",category:"فن",photo:true,prompt:"Redraw this photo as a detailed graphite pencil sketch on textured white paper. Fine shading, cross-hatching, realistic proportions, visible pencil strokes, no color."},
+  {slug:"oil-painting-classic",title:"لوحة زيتية كلاسيكية",category:"فن",photo:true,prompt:"Paint this photo as a classical oil portrait in a museum style. Rich brush strokes, dark warm background, dramatic side lighting, deep colors, subtle canvas texture."},
+  {slug:"cyberpunk-neon-portrait",title:"بورتريه سايبربنك نيون",category:"خيال علمي",photo:true,prompt:"Restyle this photo as a cyberpunk portrait at night: neon pink and blue lights on the face, rainy street reflections, glowing signs in the background, futuristic jacket. Keep the face identical."},
+  {slug:"polaroid-vintage",title:"صورة بولارويد قديمة",category:"ريترو",photo:true,prompt:"Make this photo look like an old Polaroid print: white border, faded colors, light leaks, slight blur, film grain, warm nostalgic tone."},
+  {slug:"lego-minifigure",title:"شخصية ليغو",category:"ترند",photo:true,prompt:"Turn the person in this photo into a toy building-brick minifigure with a blocky body, plastic shine and printed face. Standing on a brick baseplate in a small brick-built scene, macro toy photography."},
+  {slug:"comic-book-cover",title:"غلاف مجلة كوميك",category:"ترند",photo:true,prompt:"Transform this photo into a bold comic book cover illustration: thick ink outlines, halftone dots, vivid colors, dynamic pose, speech bubble and action background, blank title banner at the top."},
+  {slug:"snow-globe",title:"كرة ثلج",category:"ترند",photo:true,prompt:"Place the person in this photo as a tiny figure inside a glass snow globe with falling snow, a miniature winter village, wooden base, warm glow, macro photo with shallow depth of field."},
+  {slug:"luxury-perfume-ad",title:"إعلان عطر فاخر",category:"منتجات",photo:false,prompt:"Luxury perfume bottle on a black marble surface with golden water splashes, dramatic rim lighting, floating gold dust, dark elegant background, commercial advertising photography, ultra sharp."},
+  {slug:"sneaker-floating",title:"حذاء رياضي معلّق",category:"منتجات",photo:false,prompt:"A modern white sneaker floating in mid-air with colorful paint splashes around it, clean gradient background, studio lighting, high-end advertising photo, sharp detail."},
+  {slug:"coffee-cup-minimal",title:"كوب قهوة بتصميم بسيط",category:"منتجات",photo:false,prompt:"A ceramic coffee cup with steam on a wooden table beside a window, soft morning light, minimal Scandinavian style, shallow depth of field, cozy warm tones, food photography."},
+  {slug:"smartwatch-product",title:"ساعة ذكية على خلفية داكنة",category:"منتجات",photo:false,prompt:"A smartwatch on a dark reflective surface with glowing blue accent light, thin mist, dramatic shadows, premium tech product render, ultra detailed, 4k."},
+  {slug:"skincare-bottle",title:"منتج عناية بالبشرة",category:"منتجات",photo:false,prompt:"A frosted glass skincare serum bottle on a pastel pink pedestal with water ripples and soft shadows, fresh green leaves nearby, clean beauty ad style, soft diffused light."},
+  {slug:"floating-island",title:"جزيرة عائمة خيالية",category:"خيال",photo:false,prompt:"A floating island in the sky with waterfalls pouring into clouds, a small stone house and green trees, golden sunset, painterly fantasy landscape, epic scale, highly detailed."},
+  {slug:"cozy-reading-nook",title:"ركن قراءة دافئ",category:"خيال",photo:false,prompt:"A cozy reading nook by a rainy window with a velvet armchair, stacked books, warm lamp light, a cat sleeping on a blanket, soft hand-painted illustration style."},
+  {slug:"astronaut-desert",title:"رائد فضاء في الصحراء",category:"سينمائي",photo:false,prompt:"An astronaut sitting on a sand dune in a vast desert at dusk, giant planet rising in the sky, long shadows, cinematic wide shot, film grain, muted warm colors."},
+  {slug:"mosque-golden-hour",title:"مسجد عند الغروب",category:"عمارة",photo:false,prompt:"A grand mosque with detailed domes and minarets at golden hour, reflecting in a calm pool, soft orange sky, peaceful atmosphere, architectural photography, wide angle, no people."},
+  {slug:"ramadan-lantern-scene",title:"فانوس رمضاني دافئ",category:"مناسبات",photo:false,prompt:"A glowing brass Ramadan lantern on a wooden table with dates and tea, crescent moon in the window behind, warm soft bokeh lights, calm festive mood, high quality photo."},
+  {slug:"eid-greeting-card",title:"بطاقة تهنئة بالعيد",category:"مناسبات",photo:false,prompt:"An elegant Eid greeting card design with gold geometric patterns on deep emerald green, crescent and stars, hanging lanterns, empty space in the center for text, luxurious flat illustration."},
+  {slug:"kids-storybook-forest",title:"غابة لقصص الأطفال",category:"أطفال",photo:false,prompt:"A magical forest for a children's storybook: friendly foxes, glowing mushrooms, tiny lanterns, soft pastel colors, rounded shapes, warm light, gentle watercolor illustration."},
+  {slug:"isometric-room",title:"غرفة مصغّرة ثلاثية الأبعاد",category:"3D",photo:false,prompt:"A tiny isometric gaming room diorama with a desk, glowing monitor, plants and neon sign, cutaway walls, soft 3D render, pastel colors, clean background."},
+  {slug:"vintage-travel-poster",title:"ملصق سفر قديم",category:"ريترو",photo:false,prompt:"A vintage travel poster of a Mediterranean coastal town, bold flat colors, art deco typography space at the bottom, sun and sea waves, retro 1950s illustration style."},
+  {slug:"minimal-logo-mark",title:"شعار بسيط وأنيق",category:"تصميم",photo:false,prompt:"A minimal modern logo mark of a crescent combined with a book, clean geometric lines, a single deep blue color on a white background, vector style, centered, lots of negative space."},
+  {slug:"studio-headshot-pro",title:"صورة شخصية احترافية للسيرة الذاتية",category:"تعديل صور",photo:true,prompt:"Turn this photo into a professional headshot: neutral soft-gray background, even studio lighting, clean neat clothing, sharp eyes, natural skin texture. Keep the face and features exactly the same."},
+  {slug:"black-white-film-portrait",title:"بورتريه أبيض وأسود سينمائي",category:"بورتريه",photo:true,prompt:"Convert this photo into a dramatic black and white film portrait with deep contrast, soft side lighting, fine film grain and a dark background. Keep the face identical."},
+  {slug:"anime-school-scene",title:"مشهد أنمي في الشارع",category:"أنمي",photo:true,prompt:"Redraw this photo as an anime movie scene: the person walking on a quiet street under blooming trees, bright blue sky with big clouds, clean line art, vivid colors, soft wind. Keep the face recognizable."},
+  {slug:"manga-page-style",title:"صفحة مانجا بالأبيض والأسود",category:"أنمي",photo:true,prompt:"Turn this photo into a black and white manga page illustration with screen tones, sharp ink lines, speed lines and dramatic shading. Keep the face recognizable."},
+  {slug:"stained-glass-portrait",title:"بورتريه بالزجاج الملوّن",category:"فن",photo:true,prompt:"Recreate this photo as a stained glass window portrait with thick dark lead lines, jewel-toned glass pieces, light shining through, ornate border. Keep the face recognizable."},
+  {slug:"pop-art-four-panel",title:"بوب آرت بأربعة ألوان",category:"فن",photo:true,prompt:"Make a pop art poster from this photo in a 2x2 grid, each panel with a different bold color scheme, halftone dots, thick outlines, high contrast. Keep the face recognizable."},
+  {slug:"low-poly-portrait",title:"بورتريه بأشكال هندسية",category:"فن",photo:true,prompt:"Convert this photo into a low-poly geometric portrait made of colorful triangles, clean gradients, minimal dark background, modern digital art. Keep the face recognizable."},
+  {slug:"neon-line-art",title:"رسم خطوط نيون متوهجة",category:"خيال علمي",photo:true,prompt:"Turn this photo into a glowing neon line art portrait: thin continuous light lines in cyan and magenta on a pure black background, soft glow, minimal details."},
+  {slug:"double-exposure-forest",title:"تعريض مزدوج مع الغابة",category:"فن",photo:true,prompt:"Create a double exposure image: the silhouette of the person in this photo filled with a misty pine forest and mountains, soft white background, calm artistic mood, high detail."},
+  {slug:"paper-cut-art",title:"فن قص الورق",category:"فن",photo:true,prompt:"Rebuild this photo as layered paper cut art with several depth layers, soft shadows between layers, warm pastel colors, handmade craft look. Keep the face recognizable."},
+  {slug:"sticker-pack-avatar",title:"مجموعة ستيكرات لك",category:"ترند",photo:true,prompt:"Create a sheet of 9 cute cartoon stickers of the person in this photo with different expressions (happy, laughing, surprised, sleepy, thinking, thumbs up, shy, excited, cool). White outline around each sticker, plain white background."},
+  {slug:"chibi-avatar",title:"أفاتار تشيبي لطيف",category:"ترند",photo:true,prompt:"Turn the person in this photo into a cute chibi cartoon avatar with a big head, small body, big sparkling eyes, same hairstyle and outfit colors, pastel background, clean vector style."},
+  {slug:"vintage-newspaper-photo",title:"صورة في صحيفة قديمة",category:"ريترو",photo:true,prompt:"Make this photo look like a printed photo in an old yellowed newspaper from the 1940s: coarse halftone print, faded ink, paper creases, black and white. Keep the face identical."},
+  {slug:"renaissance-portrait",title:"لوحة من عصر النهضة",category:"فن",photo:true,prompt:"Paint this photo as a Renaissance era oil portrait: dark rich background, soft chiaroscuro lighting, period-style clothing, fine cracked paint texture. Keep the face identical."},
+  {slug:"fantasy-warrior",title:"محارب في عالم خيالي",category:"خيال",photo:true,prompt:"Transform the person in this photo into an epic fantasy warrior in detailed armor and a flowing cape, standing on a mountain cliff at sunrise, cinematic lighting, highly detailed digital painting. Keep the face recognizable."},
+  {slug:"arabian-nights-portrait",title:"بورتريه من الليالي العربية",category:"خيال",photo:true,prompt:"Place the person in this photo in an Arabian nights inspired scene: ornate palace courtyard, lanterns, geometric arches, warm golden light, elegant traditional clothing, modest and dignified style. Keep the face identical."},
+  {slug:"heritage-attire-portrait",title:"بورتريه بالزي التراثي",category:"بورتريه",photo:true,prompt:"Dress the person in this photo in elegant traditional Arabian heritage clothing, standing in front of an old stone building with patterned doors, warm afternoon light, realistic portrait photography. Keep the face identical."},
+  {slug:"winter-cozy-portrait",title:"بورتريه شتوي دافئ",category:"بورتريه",photo:true,prompt:"Edit this photo into a cozy winter portrait: knitted scarf and warm coat, light snowfall, soft breath mist, blurred warm lights in the background, gentle golden tones. Keep the face identical."},
+  {slug:"rainy-window-mood",title:"لقطة خلف نافذة ممطرة",category:"بورتريه",photo:true,prompt:"Make this photo look like it was shot through a rainy window at night: raindrops on the glass, blurred city lights in colorful bokeh, moody blue tones, cinematic feel. Keep the person the same."},
+  {slug:"sunset-silhouette",title:"ظل عند الغروب",category:"تعديل صور",photo:true,prompt:"Turn this photo into a silhouette of the person against a glowing orange and purple sunset sky, with a calm sea or open field below, clean artistic composition."},
+  {slug:"restore-old-photo",title:"ترميم صورة قديمة",category:"تعديل صور",photo:true,prompt:"Restore this old damaged photo: remove scratches, creases and stains, repair missing areas, sharpen the details, improve contrast, and keep the original faces and clothing exactly as they are."},
+  {slug:"colorize-bw-photo",title:"تلوين صورة أبيض وأسود",category:"تعديل صور",photo:true,prompt:"Colorize this black and white photo with natural realistic colors for skin, clothes and background. Keep all details, faces and the original composition unchanged."},
+  {slug:"enhance-quality",title:"تحسين جودة الصورة",category:"تعديل صور",photo:true,prompt:"Enhance this photo: increase sharpness and resolution, reduce noise, balance the exposure and colors, keep a natural look. Do not change faces, shapes or any content."},
+  {slug:"remove-object",title:"إزالة شيء من الصورة",category:"تعديل صور",photo:true,prompt:"Remove the unwanted object or person in the background of this photo and fill the area naturally so it matches the surrounding scene. Keep everything else exactly the same."},
+  {slug:"formal-outfit-change",title:"تغيير الملابس إلى رسمية",category:"تعديل صور",photo:true,prompt:"Change the clothing of the person in this photo to a neat formal outfit in dark navy with a clean white shirt. Keep the face, pose, hair and background exactly the same, realistic fabric and natural fit."},
+  {slug:"white-background-id",title:"صورة شخصية بخلفية بيضاء",category:"تعديل صور",photo:true,prompt:"Make this photo a clean ID-style portrait with a plain white background, face centered and looking at the camera, even soft lighting without shadows. Keep the face and features exactly the same."},
+  {slug:"expand-photo-outpaint",title:"توسيع الصورة من الجوانب",category:"تعديل صور",photo:true,prompt:"Extend this photo outward on all sides to make it a wider image. Continue the scene naturally with matching lighting, colors and perspective. Do not change the original part."},
+  {slug:"day-to-night",title:"تحويل النهار إلى ليل",category:"تعديل صور",photo:true,prompt:"Change this photo from daytime to night: dark blue sky with stars, glowing street lights and lit windows, soft moonlight on the subject. Keep the subject and composition the same."},
+  {slug:"miniature-tilt-shift",title:"مدينة مصغّرة",category:"ترند",photo:true,prompt:"Make this photo look like a tiny miniature model world using a tilt-shift effect: blurred top and bottom, boosted saturation, toy-like small scale look, bright daylight."},
+  {slug:"royal-pet-portrait",title:"حيوانك الأليف كملك",category:"ترند",photo:true,prompt:"Turn the pet in this photo into a royal portrait wearing a velvet cape and a golden crown, sitting on a throne in a grand hall, classical oil painting style, rich colors. Keep the pet's fur color and face the same."},
+  {slug:"action-figure-box",title:"مجسم أكشن في علبة",category:"ترند",photo:true,prompt:"Turn the person in this photo into an action figure sealed in a toy blister package with a cardboard backing. Include small accessories next to the figure matching their hobbies, a blank name label at the top, glossy plastic, studio product photo. Keep the face identical."},
+  {slug:"caricature-funny",title:"كاريكاتير مرح",category:"ترند",photo:true,prompt:"Draw a friendly, funny caricature of the person in this photo with a slightly enlarged head, expressive smile, bold colors and clean outlines on a simple bright background. Keep it kind and recognizable."},
+  {slug:"baby-version",title:"نسخة الطفولة منك",category:"ترند",photo:true,prompt:"Show what the person in this photo might have looked like as a cute young child, soft natural lighting, simple cozy background, keep the same hair color and eye color and a similar smile."},
+  {slug:"retro-80s-portrait",title:"بورتريه الثمانينات",category:"ريترو",photo:true,prompt:"Restyle this photo as an 80s portrait: purple and pink gradient backdrop with grid lines, soft glow, retro fashion, slight VHS grain. Keep the face identical."},
+  {slug:"magazine-cover-style",title:"غلاف مجلة أنيق",category:"ترند",photo:true,prompt:"Place the person in this photo on a stylish magazine cover with a blank masthead area on top, clean typography space, professional studio lighting, elegant outfit and a soft colored backdrop. Keep the face identical."},
+  {slug:"plush-toy-version",title:"دمية قطنية لك",category:"ترند",photo:true,prompt:"Turn the person in this photo into a soft plush toy with stitched details, button eyes and fuzzy fabric texture, sitting on a bed, warm soft light, macro toy photography."},
+  {slug:"3d-emoji-avatar",title:"إيموجي ثلاثي الأبعاد",category:"ترند",photo:true,prompt:"Convert the person in this photo into a glossy 3D emoji-style avatar with a big smile, rounded shapes, soft shadows and a pastel gradient background."},
+  {slug:"id-card-fantasy",title:"بطاقة هوية خيالية",category:"ترند",photo:true,prompt:"Design a fictional futuristic ID card featuring the person in this photo, holographic details, clean layout, made-up name and number, blank text areas, sleek metallic look."},
+  {slug:"mini-world-on-hand",title:"عالم صغير على اليد",category:"ترند",photo:false,prompt:"A tiny detailed miniature city sitting on an open human palm, small lights glowing, shallow depth of field, macro photography, soft natural light."},
+  {slug:"trading-card-style",title:"بطاقة لاعب مميزة",category:"ترند",photo:true,prompt:"Turn the person in this photo into a collectible trading card with a shiny holographic frame, bold stats area with made-up values, dynamic pose and glowing background. Keep the face identical."},
+  {slug:"remove-shadows-face",title:"تفتيح الظلال في الوجه",category:"تعديل صور",photo:true,prompt:"Softly reduce harsh shadows on the face in this photo and balance the lighting evenly. Keep skin texture natural and do not change facial features."},
+  {slug:"blur-background-bokeh",title:"خلفية ضبابية احترافية",category:"تعديل صور",photo:true,prompt:"Add a natural shallow depth of field to this photo: sharp subject, softly blurred background with creamy bokeh lights. Keep the subject unchanged."},
+  {slug:"change-background-beach",title:"تغيير الخلفية إلى شاطئ",category:"تعديل صور",photo:true,prompt:"Replace the background of this photo with a calm tropical beach at midday with turquoise water. Match lighting and shadows to the new scene. Keep the person exactly the same."},
+  {slug:"fix-lighting-indoor",title:"تحسين إضاءة صورة داخلية",category:"تعديل صور",photo:true,prompt:"Improve the lighting of this indoor photo: brighten dark areas, remove yellow tint, add soft natural window light feel, keep colors realistic and details unchanged."},
+  {slug:"straighten-crop-poster",title:"تحويل الصورة إلى بوستر",category:"تعديل صور",photo:true,prompt:"Turn this photo into a clean poster layout: centered subject, balanced margins, subtle color grading, space at the bottom for a title. Do not alter the subject."},
+  {slug:"burger-hero-shot",title:"برجر بصورة إعلانية",category:"طعام",photo:false,prompt:"A juicy gourmet burger with melted cheese, fresh lettuce and sesame bun, rising steam, dark moody background, dramatic side lighting, commercial food photography, ultra detailed."},
+  {slug:"arabic-coffee-set",title:"قهوة عربية ودلة",category:"طعام",photo:false,prompt:"A traditional Arabic coffee pot (dallah) beside small cups and a plate of dates on a woven mat, warm lantern light, cozy evening atmosphere, high quality food photography."},
+  {slug:"dessert-chocolate-drip",title:"كيكة شوكولاتة لامعة",category:"طعام",photo:false,prompt:"A glossy chocolate cake with dripping ganache and fresh strawberries on a white cake stand, soft window light, shallow depth of field, bakery advertising photo."},
+  {slug:"fresh-juice-splash",title:"عصير فواكه منعش",category:"طعام",photo:false,prompt:"A tall glass of fresh orange juice with a splash, ice cubes and orange slices flying, bright yellow background, crisp studio lighting, refreshing beverage ad."},
+  {slug:"breakfast-table-top",title:"مائدة فطور من الأعلى",category:"طعام",photo:false,prompt:"A top-down view of a rustic breakfast table with fresh bread, eggs, olives, cheese, tea and fruit on a wooden surface, natural morning light, flat lay food photography."},
+  {slug:"ice-cream-pastel",title:"آيس كريم بألوان باستيل",category:"طعام",photo:false,prompt:"Three scoops of pastel colored ice cream in a waffle cone against a soft mint background, small melting drips, playful summer vibe, clean studio photo."},
+  {slug:"headphones-product",title:"سماعات بإضاءة ملونة",category:"منتجات",photo:false,prompt:"Premium wireless headphones floating above a dark surface with soft purple and blue rim lights, subtle reflections, sleek tech product render, ultra sharp."},
+  {slug:"watch-luxury-macro",title:"ساعة فاخرة عن قرب",category:"منتجات",photo:false,prompt:"Macro shot of a luxury mechanical wristwatch with a sapphire crystal face, fine metal details, soft reflections, dark elegant background, premium advertising photography."},
+  {slug:"backpack-outdoor-ad",title:"حقيبة ظهر للمغامرات",category:"منتجات",photo:false,prompt:"A rugged olive green backpack on a rocky mountain trail at sunrise, morning mist, adventure brand advertisement style, realistic details, wide cinematic shot."},
+  {slug:"phone-mockup-clean",title:"جوال بخلفية بسيطة",category:"منتجات",photo:false,prompt:"A modern smartphone standing on a clean pastel gradient background with soft shadow, screen showing a blank gradient, minimal product mockup, soft studio lighting."},
+  {slug:"candle-spa-scene",title:"شمعة بأجواء الاسترخاء",category:"منتجات",photo:false,prompt:"A scented candle in a glass jar on a stone tray with eucalyptus leaves and a folded towel, soft warm glow, calm spa mood, lifestyle product photography."},
+  {slug:"water-bottle-splash",title:"زجاجة ماء منعشة",category:"منتجات",photo:false,prompt:"A clear water bottle with droplets on a bright blue background with a fresh water splash behind it, crisp light, refreshing commercial advertising photo."},
+  {slug:"underwater-city",title:"مدينة تحت الماء",category:"خيال",photo:false,prompt:"A glowing futuristic city under the ocean inside glass domes, schools of fish swimming past, light rays from the surface, deep blue tones, epic digital concept art."},
+  {slug:"dragon-mountain",title:"تنين على قمة جبل",category:"خيال",photo:false,prompt:"A majestic dragon perched on a snowy mountain peak at dawn, wings partially spread, golden light breaking through clouds, epic fantasy digital painting, highly detailed."},
+  {slug:"robot-garden",title:"روبوت يسقي الزهور",category:"خيال",photo:false,prompt:"A small friendly robot watering colorful flowers in a sunny garden, soft pastel colors, warm light, charming storybook illustration style."},
+  {slug:"magic-library",title:"مكتبة سحرية",category:"خيال",photo:false,prompt:"A giant magical library with endless shelves, floating glowing books, spiral staircases, warm golden light and dust particles, cinematic fantasy concept art."},
+  {slug:"space-station-earth",title:"محطة فضائية فوق الأرض",category:"خيال علمي",photo:false,prompt:"A futuristic space station orbiting Earth with the sun rising behind the planet, glowing city lights below, realistic sci-fi concept art, ultra detailed, wide shot."},
+  {slug:"modern-living-room",title:"صالة معيشة عصرية",category:"ديكور",photo:false,prompt:"A bright modern living room with a beige sofa, wooden coffee table, large plants and big windows, soft natural light, minimal Scandinavian interior design photo."},
+  {slug:"majlis-arabic-design",title:"مجلس عربي فاخر",category:"ديكور",photo:false,prompt:"A luxurious Arabic majlis with floor seating cushions, geometric patterned carpets, brass lanterns and warm ambient lighting, elegant interior photography."},
+  {slug:"minimal-bedroom",title:"غرفة نوم هادئة",category:"ديكور",photo:false,prompt:"A calm minimalist bedroom with linen bedding, a wooden headboard, soft beige tones and a small plant by the window, morning light, interior design photography."},
+  {slug:"home-office-setup",title:"مكتب منزلي مرتب",category:"ديكور",photo:false,prompt:"A clean home office setup with a wooden desk, ultrawide monitor, small plant, warm desk lamp and shelves with books, cozy evening lighting, lifestyle photo."},
+  {slug:"modern-villa-exterior",title:"فيلا عصرية من الخارج",category:"عمارة",photo:false,prompt:"A modern white villa with large glass windows, a small pool and landscaped palm trees at sunset, architectural visualization, ultra realistic, wide angle."},
+  {slug:"old-city-alley",title:"زقاق مدينة قديمة",category:"عمارة",photo:false,prompt:"A narrow alley in an old city with stone walls, wooden balconies and hanging lanterns, warm afternoon light, no people, travel photography."},
+  {slug:"mountain-lake-dawn",title:"بحيرة جبلية عند الفجر",category:"طبيعة",photo:false,prompt:"A still mountain lake at dawn with mist over the water, snowy peaks reflected perfectly, soft pink and gold sky, ultra high resolution landscape photography."},
+  {slug:"desert-dunes-stars",title:"كثبان رملية تحت النجوم",category:"طبيعة",photo:false,prompt:"Smooth sand dunes under a clear night sky full of stars and the Milky Way, soft moonlight on the sand ripples, long exposure landscape photography."},
+  {slug:"rain-forest-waterfall",title:"شلال في غابة مطيرة",category:"طبيعة",photo:false,prompt:"A powerful waterfall in a lush green rainforest with mist, moss covered rocks and sun rays through the trees, long exposure nature photography."},
+  {slug:"ramadan-kareem-poster",title:"بوستر رمضان كريم",category:"مناسبات",photo:false,prompt:"A beautiful Ramadan poster with a glowing crescent moon, hanging lanterns, geometric gold patterns on deep navy background, empty space in the middle for text, elegant flat illustration."},
+  {slug:"mawlid-style-card",title:"بطاقة دعاء بخلفية هادئة",category:"مناسبات",photo:false,prompt:"A calm greeting card background with soft green and gold geometric patterns, a small lantern and crescent moon, plenty of empty space in the center for a prayer text, peaceful elegant design."},
+  {slug:"hajj-umrah-wish-card",title:"بطاقة تهنئة بالعمرة",category:"مناسبات",photo:false,prompt:"An elegant congratulations card with a soft golden sky, a simple silhouette of a mosque dome and minaret, delicate ornamental border, empty central area for text, serene mood."},
+  {slug:"kids-alphabet-poster",title:"بوستر حروف للأطفال",category:"أطفال",photo:false,prompt:"A colorful educational poster for kids with cute cartoon animals next to large rounded letters, bright flat colors, clean white background, friendly playful illustration."},
+  {slug:"kids-space-adventure",title:"مغامرة فضائية للأطفال",category:"أطفال",photo:false,prompt:"A cheerful cartoon rocket flying past smiling planets and stars, bright pastel colors, rounded shapes, children's book illustration, soft shading."},
+  {slug:"kids-bedroom-theme",title:"غرفة أطفال ملونة",category:"أطفال",photo:false,prompt:"A cozy children's bedroom with a small tent, soft pastel walls, toys on shelves, star shaped lamps and a fluffy rug, bright cheerful interior photo."},
+  {slug:"business-card-clean",title:"بطاقة عمل أنيقة",category:"تصميم",photo:false,prompt:"A clean modern business card design mockup on a marble surface, deep blue and white colors, simple geometric logo area, blank text lines, soft shadows, top-down view."},
+  {slug:"social-post-template",title:"قالب منشور تواصل اجتماعي",category:"تصميم",photo:false,prompt:"A modern social media post template with a bold gradient background, large empty text area, simple geometric shapes and soft shadows, clean contemporary graphic design."},
+  {slug:"youtube-thumbnail-bg",title:"خلفية صورة مصغّرة لفيديو",category:"تصميم",photo:false,prompt:"A vibrant YouTube thumbnail background with a bright yellow and blue split color, radial light burst, empty space on the left for text and the right for a subject, high contrast."},
+  {slug:"app-icon-glossy",title:"أيقونة تطبيق لامعة",category:"تصميم",photo:false,prompt:"A glossy rounded-square mobile app icon with a simple crescent and star symbol in white on a deep green gradient, soft inner shadow, clean modern design, centered."},
+  {slug:"made-of-cake",title:"صورتك مصنوعة من الكعك",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a life-size sculpture made entirely of cake: sponge layers, cream frosting, icing details and fruit toppings. Keep the face, pose and outfit colors recognizable. Bakery display photography, soft light."},
+  {slug:"made-of-mud",title:"صورتك مصنوعة من الطين",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a sculpture made of wet brown mud and clay with visible finger marks and cracks as it dries. Keep the face and pose recognizable. Natural daylight, realistic texture."},
+  {slug:"made-of-clouds",title:"صورتك مصنوعة من الغيوم",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made entirely of soft white fluffy clouds floating in a blue sky, with golden sunlight on the edges. Keep the face and pose recognizable. Dreamy, ultra detailed."},
+  {slug:"made-of-snow",title:"صورتك مصنوعة من الثلج",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a snow sculpture with packed snow texture, sparkling frost and soft blue shadows, standing in a snowy field. Keep the face and pose recognizable."},
+  {slug:"made-of-ice",title:"صورتك مصنوعة من الجليد",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a transparent ice sculpture with sharp frozen edges, trapped air bubbles and cold blue light refracting through it. Keep the face and pose recognizable. Studio photography."},
+  {slug:"made-of-iron",title:"صورتك مصنوعة من الحديد",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a heavy cast iron statue with dark metal texture, rivets, welded seams and subtle scratches. Keep the face and pose recognizable. Dramatic industrial lighting."},
+  {slug:"made-of-gold",title:"صورتك مصنوعة من الذهب",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a polished solid gold statue with mirror-like reflections and warm highlights, on a dark velvet background. Keep the face and pose recognizable. Luxury product photography."},
+  {slug:"made-of-silver",title:"صورتك مصنوعة من الفضة",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a shiny liquid silver sculpture with smooth chrome reflections and soft studio lights. Keep the face and pose recognizable. Clean gray background."},
+  {slug:"made-of-copper",title:"صورتك مصنوعة من النحاس",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a hammered copper sculpture with warm orange tones, green patina in the crevices and visible hammer marks. Keep the face and pose recognizable."},
+  {slug:"made-of-bronze",title:"تمثال برونزي لك",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a classical bronze statue on a stone pedestal in a town square, aged green and brown patina, soft overcast light. Keep the face and pose recognizable."},
+  {slug:"made-of-glass",title:"صورتك مصنوعة من الزجاج",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a crystal clear glass sculpture with light refraction, soft caustics and delicate reflections on a white surface. Keep the face and pose recognizable."},
+  {slug:"made-of-wood",title:"صورتك منحوتة من الخشب",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a hand-carved wooden sculpture with visible wood grain, chisel marks and warm brown tones, in a carpenter's workshop. Keep the face and pose recognizable."},
+  {slug:"made-of-stone",title:"صورتك منحوتة من الصخر",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a rough granite stone sculpture with chiseled surfaces, small cracks and moss in the corners, outdoors in soft light. Keep the face and pose recognizable."},
+  {slug:"made-of-marble",title:"تمثال رخامي أبيض",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a smooth white marble statue with fine gray veins, classical sculpture style, in a museum hall with soft light. Keep the face and pose recognizable."},
+  {slug:"made-of-sand",title:"صورتك مصنوعة من الرمل",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a sand sculpture on a beach, with fine grain texture, small crumbling edges and wind blowing sand particles, golden hour light. Keep the face and pose recognizable."},
+  {slug:"made-of-paper",title:"صورتك مصنوعة من الورق",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into an origami-style folded paper figure with crisp creases and white and cream paper layers, soft shadows, clean background. Keep the face and pose recognizable."},
+  {slug:"made-of-cardboard",title:"صورتك من الكرتون",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a handmade cardboard sculpture with visible corrugated layers, glue marks and brown paper texture, on a craft table. Keep the face and pose recognizable."},
+  {slug:"made-of-knitted-wool",title:"صورتك محبوكة بالصوف",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a knitted wool figure with visible stitches, soft fuzzy yarn and warm colors, macro photography. Keep the face and pose recognizable."},
+  {slug:"made-of-felt",title:"صورتك من اللباد",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a handmade felt craft figure with soft fabric texture, stitched edges and bright colors, on a pastel background. Keep the face and pose recognizable."},
+  {slug:"made-of-balloons",title:"صورتك من البالونات",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a balloon sculpture made of shiny twisted and round balloons in matching colors, with glossy highlights, bright party background. Keep the face and pose recognizable."},
+  {slug:"made-of-candy",title:"صورتك مصنوعة من الحلوى",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of colorful hard candy, gummies and lollipops with glossy sugar shine, on a bright pastel background. Keep the face and pose recognizable."},
+  {slug:"made-of-chocolate",title:"صورتك من الشوكولاتة",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a smooth dark chocolate sculpture with glossy melted drips, cocoa powder dust and a few chocolate pieces around, warm studio light. Keep the face and pose recognizable."},
+  {slug:"made-of-cookies",title:"صورتك من البسكويت",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a decorated cookie figure with golden baked texture, white icing details and sprinkles, on a baking tray. Keep the face and pose recognizable."},
+  {slug:"made-of-gingerbread",title:"صورتك من خبز الزنجبيل",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a gingerbread figure with brown baked texture, white icing outlines, candy buttons, in a cozy kitchen with warm lights. Keep the face and pose recognizable."},
+  {slug:"made-of-bread",title:"صورتك من الخبز",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a sculpture made of freshly baked bread with golden crust, flour dust and braided dough details, on a wooden bakery table. Keep the face and pose recognizable."},
+  {slug:"made-of-cotton-candy",title:"صورتك من غزل البنات",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of fluffy pink and blue cotton candy with soft wispy fibers, funfair background with blurred lights. Keep the face and pose recognizable."},
+  {slug:"made-of-jelly",title:"صورتك من الجيلي",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a translucent colorful jelly sculpture with glossy wobbly surfaces and inner light glow, on a white plate. Keep the face and pose recognizable."},
+  {slug:"made-of-honey",title:"صورتك من العسل",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a golden honey sculpture with flowing amber drips, glossy translucent look and warm backlight, honeycomb patterns around. Keep the face and pose recognizable."},
+  {slug:"made-of-flowers",title:"صورتك من الزهور",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made entirely of fresh colorful flowers and petals, roses, daisies and green leaves, soft garden light. Keep the face and pose recognizable."},
+  {slug:"made-of-leaves",title:"صورتك من أوراق الشجر",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of autumn leaves in red, orange and yellow, layered like feathers, forest floor background with soft light. Keep the face and pose recognizable."},
+  {slug:"made-of-moss",title:"صورتك من الطحلب والعشب",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a living sculpture covered in green moss, grass and tiny wildflowers, in a misty forest. Keep the face and pose recognizable. Natural light."},
+  {slug:"made-of-lava",title:"صورتك من الحمم البركانية",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of cooled black volcanic rock with glowing orange lava cracks, sparks rising in the air, dark dramatic background. Keep the face and pose recognizable."},
+  {slug:"made-of-fire",title:"صورتك من النار",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a silhouette formed of swirling orange and yellow flames with floating embers on a dark background. Keep the pose and face outline recognizable. Dramatic lighting."},
+  {slug:"made-of-water",title:"صورتك من الماء",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of flowing clear water with splashes, ripples and droplets frozen in mid-air, bright light refracting. Keep the face and pose recognizable."},
+  {slug:"made-of-smoke",title:"صورتك من الدخان",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of soft swirling smoke in white and gray, fading at the edges into the air, dark background with rim light. Keep the face and pose recognizable."},
+  {slug:"made-of-crystals",title:"صورتك من البلّور",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a sculpture made of sharp amethyst and quartz crystals with glowing purple inner light and sparkling facets. Keep the face and pose recognizable. Dark background."},
+  {slug:"made-of-diamonds",title:"صورتك من الألماس",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of brilliant cut diamonds with rainbow light refractions and sparkling reflections, on a black velvet background. Keep the face and pose recognizable."},
+  {slug:"made-of-neon-tubes",title:"صورتك من أنابيب النيون",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a glowing neon tube sign portrait in pink, blue and white, mounted on a dark brick wall, soft light glow on the wall. Keep the face outline recognizable."},
+  {slug:"made-of-circuit-board",title:"صورتك من الدوائر الإلكترونية",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of electronic circuit boards, tiny chips, wires and glowing green traces, macro tech photography. Keep the face and pose recognizable."},
+  {slug:"made-of-newspaper",title:"صورتك من قصاصات الصحف",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a collage made of torn newspaper pieces and magazine cutouts layered into the face and clothes, paper texture, soft shadows. Keep the face recognizable."},
+  {slug:"made-of-coffee-beans",title:"صورتك من حبوب القهوة",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a portrait made entirely of roasted coffee beans in different shades of brown, warm top-down lighting, rich texture. Keep the face recognizable."},
+  {slug:"made-of-fruits",title:"صورتك من الفواكه",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of fresh colorful fruits like oranges, strawberries, kiwi and grapes, with water droplets, bright studio background. Keep the face and pose recognizable."},
+  {slug:"made-of-porcelain",title:"صورتك من الخزف الأبيض",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a delicate white porcelain figurine with blue hand-painted patterns, glossy glaze and tiny fine cracks, on a wooden shelf. Keep the face and pose recognizable."},
+  {slug:"made-of-rusty-metal",title:"صورتك من الحديد الصدئ",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a sculpture made of welded scrap metal pieces, bolts and rusty plates with orange-brown corrosion, in an old junkyard. Keep the face and pose recognizable."},
+  {slug:"made-of-bubbles",title:"صورتك من فقاعات الصابون",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of clustered iridescent soap bubbles with rainbow reflections, soft bright sky background. Keep the face and pose recognizable."},
+  {slug:"made-of-galaxy",title:"صورتك من المجرّة والنجوم",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a silhouette filled with a colorful galaxy, nebula clouds and thousands of stars in purple, blue and pink, on a deep black background. Keep the face outline recognizable."},
+  {slug:"made-of-feathers",title:"صورتك من الريش",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a figure made of soft layered feathers in white, cream and soft blue, floating feathers in the air, airy bright background. Keep the face and pose recognizable."},
+  {slug:"made-of-mosaic",title:"صورتك من فسيفساء ملونة",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a mosaic artwork made of small colored ceramic tiles with thin grout lines, on an old wall with geometric Islamic border patterns. Keep the face recognizable."},
+  {slug:"made-of-wire",title:"صورتك من الأسلاك",category:"تحويل مواد",photo:true,prompt:"Transform the person in this photo into a wire sculpture made of thin twisted metal wires forming the face and body outline, light casting detailed shadows on a white wall. Keep the pose recognizable."},
+  {slug:"best-driver-certificate",title:"شهادة أفضل سائق",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a decorative novelty award certificate titled BEST DRIVER AWARD, clearly a fun keepsake and not an official document. Elegant gold border, a small car icon, a round gold seal. Place the person from the attached photo in a circular frame at the top, keeping the face identical. Text: Name: [NAME], Favorite car: [CAR], Date: [DATE]. Spell all text exactly as written."},
+  {slug:"anime-expert-certificate",title:"شهادة خبير أنمي",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a fun certificate titled ANIME EXPERT CERTIFICATE with a colorful anime-inspired design, sparkles, speed lines and a star seal. Place the person from the attached photo as an anime-style portrait in a frame at the top, keeping the face recognizable. Text: Name: [NAME], Favorite anime: [ANIME], Anime watched: [NUMBER], Rank: Master Otaku. Spell all text exactly as written."},
+  {slug:"battle-royale-pro-certificate",title:"شهادة محترف باتل رويال",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create an esports style certificate titled BATTLE ROYALE PRO PLAYER with a dark background, orange and red neon accents, a crosshair emblem and a golden trophy. Place the person from the attached photo in a hexagon frame in the center, keeping the face identical. Text: Player: [NICKNAME], Wins: [NUMBER], Rank: Heroic Champion. Spell all text exactly as written."},
+  {slug:"gamer-of-year-certificate",title:"شهادة لاعب العام",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a glowing gaming award certificate titled GAMER OF THE YEAR with controller icons, purple and cyan neon lights and a trophy. Place the person from the attached photo in a frame with a glowing outline, keeping the face identical. Text: Name: [NAME], Favorite game: [GAME], Year: [YEAR]. Spell all text exactly as written."},
+  {slug:"football-star-certificate",title:"شهادة نجم الكرة",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a sports award certificate titled FOOTBALL STAR with a green pitch pattern, a golden ball emblem and a ribbon. Place the person from the attached photo in a circular frame, keeping the face identical. Text: Name: [NAME], Position: [POSITION], Goals scored: [NUMBER]. Spell all text exactly as written."},
+  {slug:"best-cook-certificate",title:"شهادة أمهر طبّاخ",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a warm certificate titled MASTER CHEF AWARD with a cream background, a chef hat icon, crossed spoons and a red ribbon seal. Place the person from the attached photo in an oval frame wearing a chef hat, keeping the face identical. Text: Name: [NAME], Signature dish: [DISH], Experience: [YEARS] years. Spell all text exactly as written."},
+  {slug:"top-student-certificate",title:"شهادة طالب متفوق",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a classic school excellence certificate titled TOP STUDENT AWARD with a deep blue and gold border, a graduation cap icon and a wax seal. Place the person from the attached photo in a framed portrait, keeping the face identical. Text: Name: [NAME], Favorite subject: [SUBJECT], Level: [GRADE]. Spell all text exactly as written."},
+  {slug:"genius-iq-certificate",title:"شهادة عبقري زمانه",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a funny novelty certificate titled GENIUS OF THE CENTURY with a light bulb and brain icons, gold stars and a dramatic seal. Place the person from the attached photo in a circular frame, keeping the face identical. Text: Name: [NAME], Genius field: [FIELD], IQ: Over 9000. Spell all text exactly as written."},
+  {slug:"best-father-certificate",title:"شهادة أفضل أب",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a heartfelt certificate titled BEST DAD IN THE WORLD with warm brown and gold colors, a medal and soft decorative corners. Place the person from the attached photo in a frame at the top, keeping the face identical. Text: Name: [NAME], Reason: [SHORT REASON], From: [CHILDREN NAMES]. Spell all text exactly as written."},
+  {slug:"best-mother-certificate",title:"شهادة أفضل أم",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a heartfelt certificate titled BEST MOM IN THE WORLD with soft pink and gold colors, flowers and a heart-shaped seal. Place the person from the attached photo in an oval frame, keeping the face identical. Text: Name: [NAME], Reason: [SHORT REASON], From: [CHILDREN NAMES]. Spell all text exactly as written."},
+  {slug:"best-employee-certificate",title:"شهادة موظف العام",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a professional employee of the year certificate with a navy and silver design, a laurel wreath and a formal seal. Place the person from the attached photo in a clean framed portrait, keeping the face identical. Text: Employee of the Year, Name: [NAME], Position: [JOB TITLE], Company: [COMPANY]. Spell all text exactly as written."},
+  {slug:"coffee-lover-certificate",title:"شهادة عاشق القهوة",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a cozy certificate titled COFFEE LOVER DIPLOMA with a coffee bean pattern, a steaming cup icon and a brown and cream palette. Place the person from the attached photo in a round frame like a coffee cup lid, keeping the face identical. Text: Name: [NAME], Favorite coffee: [COFFEE], Cups per day: [NUMBER]. Spell all text exactly as written."},
+  {slug:"sleep-champion-certificate",title:"شهادة بطل النوم",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a funny certificate titled OFFICIAL SLEEP CHAMPION with moon, stars, pillow and Zzz icons on a dark blue night sky background and a golden medal. Place the person from the attached photo in a circular frame, keeping the face identical. Text: Name: [NAME], Sleep record: [HOURS] hours, Rank: Grand Master of Naps. Spell all text exactly as written."},
+  {slug:"photographer-certificate",title:"شهادة مصوّر محترف",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create an elegant certificate titled PROFESSIONAL PHOTOGRAPHER with a black and gold design, a camera lens icon and a film strip border. Place the person from the attached photo in a frame, keeping the face identical. Text: Name: [NAME], Specialty: [TYPE], Camera: [CAMERA]. Spell all text exactly as written."},
+  {slug:"programmer-certificate",title:"شهادة مبرمج محترف",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a tech style certificate titled EXPERT PROGRAMMER with a dark code editor look, green terminal text accents, brackets symbols and a digital badge. Place the person from the attached photo in a square frame, keeping the face identical. Text: Name: [NAME], Language: [LANGUAGE], Projects: [NUMBER]. Spell all text exactly as written."},
+  {slug:"explorer-traveler-certificate",title:"شهادة مستكشف ورحّالة",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a vintage explorer certificate titled WORLD EXPLORER on aged parchment with a compass, old map lines and a wax seal. Place the person from the attached photo in a frame, keeping the face identical. Text: Name: [NAME], Countries visited: [NUMBER], Favorite place: [PLACE]. Spell all text exactly as written."},
+  {slug:"fitness-champion-certificate",title:"شهادة بطل اللياقة",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create an energetic certificate titled FITNESS CHAMPION with bold black and orange colors, dumbbell and medal icons and dynamic diagonal lines. Place the person from the attached photo in a strong framed portrait, keeping the face identical. Text: Name: [NAME], Sport: [SPORT], Achievement: [ACHIEVEMENT]. Spell all text exactly as written."},
+  {slug:"artist-drawing-certificate",title:"شهادة فنان مبدع",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a colorful art certificate titled CREATIVE ARTIST AWARD with paint splashes, brushes and a palette icon on a clean white background and a gold seal. Place the person from the attached photo in a frame with paint-splash edges, keeping the face identical. Text: Name: [NAME], Art type: [TYPE], Artworks: [NUMBER]. Spell all text exactly as written."},
+  {slug:"bookworm-certificate",title:"شهادة قارئ نَهِم",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a literary certificate titled BOOKWORM OF THE YEAR with a stack of books, a feather pen and warm paper texture and a green ribbon seal. Place the person from the attached photo in an oval frame, keeping the face identical. Text: Name: [NAME], Favorite book: [BOOK], Books read: [NUMBER]. Spell all text exactly as written."},
+  {slug:"graduation-keepsake-certificate",title:"شهادة تخرج تذكارية",category:"شهادات",photo:true,prompt:"Attach your photo, then replace the words in [ ] with your info. Create a decorative keepsake graduation certificate, clearly a souvenir and not an official document, with an elegant gold and burgundy border, a graduation cap and a ribbon seal. Place the person from the attached photo in a framed portrait wearing a graduation gown, keeping the face identical. Text: Congratulations Graduate, Name: [NAME], Major: [MAJOR], Year: [YEAR]. Spell all text exactly as written."},
+  {slug:"expand-to-wide-landscape",title:"توسيع الصورة بشكل عرضي",category:"تعديل صور",photo:true,prompt:"Expand this photo into a wide 16:9 landscape image. Extend the scene naturally to the left and right with matching lighting, colors, perspective and details. Do not change anything in the original part of the photo."},
+  {slug:"expand-to-vertical-story",title:"توسيع الصورة للستوري",category:"تعديل صور",photo:true,prompt:"Expand this photo into a tall 9:16 vertical image for social media stories. Extend the scene above and below naturally, matching lighting and style. Keep the original subject and details unchanged."},
+  {slug:"expand-to-square",title:"تحويل الصورة إلى مربع",category:"تعديل صور",photo:true,prompt:"Turn this photo into a perfect 1:1 square by extending the missing areas naturally instead of cropping. Match the background, lighting and textures. Do not alter the main subject."},
+  {slug:"sharpen-blurry-photo",title:"توضيح صورة ضبابية",category:"تعديل صور",photo:true,prompt:"Make this blurry photo clear and sharp. Recover fine details in the face, eyes, hair and clothes, and improve contrast. Keep the original faces, colors and composition exactly the same. Do not add or remove anything."},
+  {slug:"deblur-motion",title:"إزالة اهتزاز الحركة",category:"تعديل صور",photo:true,prompt:"Remove the motion blur and camera shake from this photo. Restore sharp edges and natural details while keeping the same people, pose, colors and background."},
+  {slug:"upscale-details-4k",title:"رفع الدقة وإظهار التفاصيل",category:"تعديل صور",photo:true,prompt:"Upscale this photo to ultra high resolution with crisp natural details, realistic skin and fabric textures, and clean edges. Keep everything identical to the original without inventing new elements."},
+  {slug:"remove-noise-grain",title:"إزالة التشويش والحبيبات",category:"تعديل صور",photo:true,prompt:"Remove the noise and grain from this low-light photo while preserving details and natural skin texture. Slightly brighten the shadows and keep colors realistic. Do not change any content."},
+  {slug:"describe-image-detailed",title:"شرح الصورة بالتفصيل",category:"تعديل صور",photo:true,prompt:"Describe this image in detail. Cover the main subject, people and what they are doing, clothing, facial expressions, background, location type, colors, lighting, time of day, mood and any visible text or objects. Organize the answer under clear headings and write it in Arabic."},
+  {slug:"image-to-prompt",title:"استخراج برومت من صورة",category:"تعديل صور",photo:true,prompt:"Analyze this image and write a detailed English prompt that could recreate a similar image with an AI image generator. Include subject, style, composition, camera angle, lighting, colors, mood and background. Give one main prompt and one shorter version."},
+  {slug:"extract-text-from-image",title:"استخراج النص من الصورة",category:"تعديل صور",photo:true,prompt:"Read all the text visible in this image and write it out exactly as it appears, keeping the original order and line breaks. If a part is unclear, mark it with [unclear]. After that, give a short summary of what the text is about."},
+  {slug:"translate-text-in-image",title:"ترجمة النص داخل الصورة",category:"تعديل صور",photo:true,prompt:"Find all the text in this image and translate it into Arabic. Give the original text and the translation side by side in a list. Keep names, numbers and brand names unchanged."},
+  {slug:"merge-two-people",title:"دمج شخصين في صورة واحدة",category:"تعديل صور",photo:true,prompt:"Attach two photos of two different people. Create one realistic photo of both people standing side by side in a bright park, natural daylight, matching scale and lighting. Keep each person's face, hair and features identical to their own photo. Natural friendly poses, high quality photography."},
+  {slug:"merge-family-group",title:"دمج عدة أشخاص بصورة عائلية",category:"تعديل صور",photo:true,prompt:"Attach separate photos of each family member. Combine them into one natural family portrait in a cozy living room with warm light, everyone close together and smiling. Keep each person's face and features identical to their photo, with matching lighting and proportions."},
+  {slug:"put-person-in-scene",title:"وضعك في مكان آخر",category:"تعديل صور",photo:true,prompt:"Attach two photos: one of a person and one of a place. Place the person naturally into the place photo, matching light direction, shadows, color tone, scale and perspective so it looks like one real photo. Keep the person's face and clothes identical."},
+  {slug:"night-to-day",title:"تحويل الليل إلى نهار",category:"تعديل صور",photo:true,prompt:"Change this photo from night to a bright sunny day. Replace the dark sky with a clear blue sky and soft clouds, add natural sunlight and shadows, and adjust colors to daylight. Keep the subject and composition unchanged."},
+  {slug:"change-to-sunrise",title:"تحويل الوقت إلى شروق الشمس",category:"تعديل صور",photo:true,prompt:"Change the time of day in this photo to sunrise: soft pink and golden sky, low warm sunlight, long gentle shadows and light morning mist. Keep the subject and composition exactly the same."},
+  {slug:"change-to-blue-hour",title:"تحويل الوقت إلى الساعة الزرقاء",category:"تعديل صور",photo:true,prompt:"Change this photo to the blue hour just after sunset: deep blue sky, warm lights turned on in windows and street lamps, cool shadows. Keep the subject and composition unchanged."},
+  {slug:"summer-to-winter",title:"تحويل الصيف إلى شتاء",category:"تعديل صور",photo:true,prompt:"Change this scene from summer to winter: snow on the ground and rooftops, bare trees, cold pale light and a soft gray sky. Keep the people and main objects the same, and add warm winter clothing only if needed."},
+  {slug:"add-rain-weather",title:"إضافة مطر للصورة",category:"تعديل صور",photo:true,prompt:"Add realistic rain to this photo: falling raindrops, wet ground with reflections, darker cloudy sky and a slightly cooler tone. Keep the subject and composition the same."},
+  {slug:"add-fog-mist",title:"إضافة ضباب للصورة",category:"تعديل صور",photo:true,prompt:"Add soft atmospheric fog to this photo, thicker in the distance and lighter near the subject, with gentle light rays and muted colors. Keep the subject sharp and unchanged."},
+  {slug:"remove-glasses",title:"إزالة النظارة",category:"تعديل صور",photo:true,prompt:"Remove the glasses from the person in this photo and naturally reconstruct the eyes and the skin around them. Keep the face, expression, hair and background exactly the same."},
+  {slug:"change-hair-color",title:"تغيير لون الشعر",category:"تعديل صور",photo:true,prompt:"Change the hair color of the person in this photo to deep chestnut brown with natural shine and realistic strands. Keep the hairstyle, face, skin tone and background exactly the same."},
+  {slug:"change-clothes-color",title:"تغيير لون الملابس",category:"تعديل صور",photo:true,prompt:"Change the color of the person's clothing in this photo to deep green. Keep the fabric texture, folds, shadows, face, pose and background exactly the same."},
+  {slug:"fix-closed-eyes",title:"إصلاح العيون المغمضة",category:"تعديل صور",photo:true,prompt:"Fix anyone with closed or half-closed eyes in this photo by opening their eyes naturally. Keep each face, expression, skin and the rest of the photo unchanged."},
+  {slug:"remove-people-background",title:"إزالة المارّة من الخلفية",category:"تعديل صور",photo:true,prompt:"Remove all the people in the background of this photo, except the main subjects in front, and fill the empty areas naturally with matching ground, walls and scenery. Keep everything else unchanged."},
+  {slug:"add-object-to-photo",title:"إضافة شيء إلى الصورة",category:"تعديل صور",photo:true,prompt:"Add a [OBJECT] to this photo in a natural place, matching the lighting, shadows, perspective and scale of the scene. Keep everything else exactly the same. Replace [OBJECT] with what you want to add."},
+  {slug:"replace-sky",title:"استبدال السماء",category:"تعديل صور",photo:true,prompt:"Replace the sky in this photo with a dramatic sunset sky full of orange and purple clouds. Adjust the lighting and colors of the whole scene to match the new sky. Keep the foreground unchanged."},
+  {slug:"sketch-to-realistic",title:"تحويل الرسمة إلى صورة واقعية",category:"تعديل صور",photo:true,prompt:"Turn this drawing or sketch into a realistic photograph. Keep the same composition, shapes and proportions, and add natural textures, colors, lighting and depth."},
+  {slug:"photo-critique",title:"تقييم الصورة ونصائح لتحسينها",category:"تعديل صور",photo:true,prompt:"Review this photo as a professional photographer. Rate it out of 10 and explain the composition, lighting, focus, colors and background. List 5 clear tips to improve it, and suggest the best crop. Write the answer in Arabic."},
+  {slug:"photo-caption-alt-text",title:"كتابة وصف وتعليق للصورة",category:"تعديل صور",photo:true,prompt:"Write for this image: 1) a short alt text description, 2) three catchy social media captions in Arabic in different tones (funny, calm, inspiring), 3) ten relevant hashtags."},
+
+  /* ⬆⬆⬆ نهاية البرومتات ⬆⬆⬆ */
+];
+
+/* =====================================================
+   الصفحات الثابتة (عدّل النصوص كما تريد)
+   ===================================================== */
+const SITE_EMAIL = "ضع-بريدك@example.com";
+const PAGES = {
+  about: {t:"من نحن", b:["مكتبة البرومتات موقع يجمع أوامر الذكاء الاصطناعي لعمل الصور وتعديلها، بحيث تنسخ البرومت وتجرّبه مباشرة في أداتك المفضلة.","نضيف برومتات جديدة باستمرار، ونتابع الترندات لنوفر لك أحدثها بسرعة."]},
+  contact:{t:"تواصل معنا", b:["لأي اقتراح أو ملاحظة أو طلب برومت، راسلنا على: "+SITE_EMAIL]},
+  privacy:{t:"سياسة الخصوصية", b:["نحترم خصوصيتك. لا نطلب منك تسجيل حساب ولا نجمع بيانات شخصية مباشرة.","قد يعرض الموقع إعلانات من أطراف خارجية (مثل A-ADS)، وقد تستخدم هذه الشبكات ملفات تعريف الارتباط لعرض إعلانات مناسبة. يمكنك تعطيلها من إعدادات متصفحك.","باستخدامك للموقع فإنك توافق على هذه السياسة، وقد نحدّثها من وقت لآخر."]},
+  terms:{t:"الشروط والأحكام", b:["البرومتات المعروضة للاستخدام الشخصي والإبداعي.","يُمنع استخدامها لإنشاء محتوى مسيء أو غير لائق أو لانتهاك خصوصية الأشخاص أو تعديل صور أشخاص حقيقيين بشكل مسيء.","نتائج البرومتات تختلف حسب الأداة المستخدمة، ولا نضمن نتيجة معينة."]}
+};
+
+/* =====================================================
+   كود الموقع
+   ===================================================== */
+const app = document.getElementById("app");
+const toastEl = document.getElementById("toast");
+document.getElementById("yr").textContent = new Date().getFullYear();
+let currentCat = "الكل", query = "";
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>toastEl.classList.remove("show"),1800)}
+
+function copyText(text,msg){
+  const done=()=>toast(msg||"تم النسخ ✓");
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallback());
+  } else fallback();
+  function fallback(){
+    const ta=document.createElement("textarea");
+    ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");done()}catch(e){toast("تعذّر النسخ")}
+    ta.remove();
+  }
+}
+
+function goHome(){location.hash="";}
+function goPage(n){location.hash="#page/"+n;}
+function openPrompt(slug){location.hash="#p/"+slug;}
+
+function thumb(p,cls){
+  return p.image ? `<img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">` : "🎨";
+}
+
+/* الصفحة الرئيسية */
+function renderHome(){
+  document.title="مكتبة برومتات الصور بالذكاء الاصطناعي";
+  const cats=["الكل",...new Set(PROMPTS.map(p=>p.category).filter(Boolean))];
+  const q=query.trim().toLowerCase();
+  const list=PROMPTS.filter(p=>
+    (currentCat==="الكل"||p.category===currentCat) &&
+    (!q||(p.title+" "+p.prompt+" "+(p.category||"")).toLowerCase().includes(q))
+  );
+
+  app.innerHTML=`
+    <section class="hero">
+      <h1>برومتات الترند لعمل الصور وتعديلها بالذكاء الاصطناعي</h1>
+      <p>اختر البرومت، انسخه، وجرّبه في أداتك المفضلة</p>
+      <div class="search"><input id="q" type="search" placeholder="ابحث عن برومت... (مثال: أنمي، منتج، بورتريه)" value="${esc(query)}"></div>
+    </section>
+    <div class="wrap">
+      <div class="cats">${cats.map(c=>`<button class="cat ${c===currentCat?"active":""}" data-c="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+      ${list.length?`<div class="grid">${list.map(p=>`
+        <div class="card" onclick="openPrompt('${esc(p.slug)}')">
+          <div class="thumb">${thumb(p)}</div>
+          <div class="card-body"><h3>${esc(p.title)}</h3><span class="tag">${esc(p.category||"")}</span></div>
+        </div>`).join("")}</div>`
+      :`<div class="empty">${PROMPTS.length?"لا توجد نتائج مطابقة":"لم تُضف أي برومتات بعد"}</div>`}
+    </div>`;
+
+  const qi=document.getElementById("q");
+  qi.addEventListener("input",e=>{
+    query=e.target.value;
+    const pos=e.target.selectionStart;
+    renderHome();
+    const n=document.getElementById("q");n.focus();n.setSelectionRange(pos,pos);
+  });
+  app.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{currentCat=b.dataset.c;renderHome()});
+}
+
+/* صفحة البرومت */
+function renderPrompt(slug){
+  const p=PROMPTS.find(x=>x.slug===slug);
+  if(!p){app.innerHTML=`<div class="wrap"><div class="empty">البرومت غير موجود</div><div style="text-align:center"><a class="back" onclick="goHome()">← الرجوع للرئيسية</a></div></div>`;return;}
+  document.title=p.title+" | مكتبة البرومتات";
+  const related=PROMPTS.filter(x=>x.slug!==p.slug&&x.category===p.category).slice(0,4);
+  const link=location.origin+location.pathname+"#p/"+p.slug;
+
+  app.innerHTML=`
+    <div class="wrap">
+      <a class="back" onclick="goHome()">→ الرجوع للرئيسية</a>
+      <div class="detail">
+        <div class="d-wrap">
+          <div class="d-img">${thumb(p)}</div>
+          <div class="d-info">
+            <h2>${esc(p.title)}</h2>
+            <div class="meta">
+              <span class="tag">${esc(p.category||"")}</span>
+              ${p.tool?`<span class="tag">🛠 ${esc(p.tool)}</span>`:""}
+            </div>
+            ${p.photo?`<div class="note">📷 هذا البرومت يحتاج ترفع صورتك مع البرومت في الأداة.</div>`:""}
+            <div class="promptbox" id="ptxt">${esc(p.prompt)}</div>
+            <div class="btns">
+              <button class="btn btn-primary" id="cp">📋 نسخ البرومت</button>
+              <button class="btn btn-light" id="cl">🔗 نسخ الرابط</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      ${related.length?`<h2 class="sec">برومتات مشابهة</h2><div class="grid">${related.map(r=>`
+        <div class="card" onclick="openPrompt('${esc(r.slug)}')">
+          <div class="thumb">${thumb(r)}</div>
+          <div class="card-body"><h3>${esc(r.title)}</h3><span class="tag">${esc(r.category||"")}</span></div>
+        </div>`).join("")}</div>`:""}
+    </div>`;
+
+  document.getElementById("cp").onclick=()=>copyText(p.prompt,"تم نسخ البرومت ✓");
+  document.getElementById("cl").onclick=()=>copyText(link,"تم نسخ الرابط ✓");
+  window.scrollTo(0,0);
+}
+
+/* الصفحات الثابتة */
+function renderPage(n){
+  const pg=PAGES[n];
+  if(!pg){goHome();return;}
+  document.title=pg.t+" | مكتبة البرومتات";
+  app.innerHTML=`<div class="wrap"><div class="page"><h2>${esc(pg.t)}</h2>${pg.b.map(x=>`<p>${esc(x)}</p>`).join("")}</div></div>`;
+  window.scrollTo(0,0);
+}
+
+/* التوجيه */
+function route(){
+  const h=location.hash.replace(/^#/,"");
+  if(h.startsWith("p/")) renderPrompt(decodeURIComponent(h.slice(2)));
+  else if(h.startsWith("page/")) renderPage(h.slice(5));
+  else {renderHome();}
+}
+window.addEventListener("hashchange",route);
+route();
+</script>
+</body>
+</html>
